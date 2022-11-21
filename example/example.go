@@ -3,7 +3,7 @@ package main
 import (
 	"flag"
 
-	"github.com/marmotedu/log"
+	"github.com/huanghe314/log"
 )
 
 var (
@@ -22,6 +22,7 @@ func main() {
 
 	if h {
 		flag.Usage()
+
 		return
 	}
 
@@ -31,7 +32,7 @@ func main() {
 		EnableColor:      true,
 		EnableCaller:     true,
 		OutputPaths:      []string{"test.log", "stdout"},
-		ErrorOutputPaths: []string{},
+		ErrorOutputPaths: []string{"err.log", "stderr"},
 	}
 
 	log.Init(opts)

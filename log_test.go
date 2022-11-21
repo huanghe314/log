@@ -24,14 +24,14 @@ import (
 	"github.com/spf13/pflag"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/marmotedu/log"
+	"github.com/huanghe314/log"
 )
 
 func Test_WithName(t *testing.T) {
 	defer log.Flush() // used for record logger printer
 
 	logger := log.WithName("test")
-	logger.Info("Hello world!", "foo", "bar") // structed logger
+	logger.Infow("Hello world!", "foo", "bar") // structed logger
 }
 
 func Test_WithValues(t *testing.T) {
@@ -45,8 +45,8 @@ func Test_WithValues(t *testing.T) {
 func Test_V(t *testing.T) {
 	defer log.Flush() // used for record logger printer
 
-	log.V(0).Info("Hello world!", "key", "value")
-	log.V(1).Info("Hello world!", "key", "value")
+	log.V(0).Infow("Hello world!", "key", "value")
+	log.V(1).Infow("Hello world!", "key", "value")
 }
 
 func Test_Option(t *testing.T) {

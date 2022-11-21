@@ -28,12 +28,17 @@ import (
 )
 
 const (
-	flagLevel            = "log.level"
-	flagFormat           = "log.format"
-	flagEnableColor      = "log.enable-color"
-	flagEnableCaller     = "log.enable-caller"
-	flagOutputPaths      = "log.output-paths"
-	flagErrorOutputPaths = "log.error-output-paths"
+	flagLevel             = "log.level"
+	flagFormat            = "log.format"
+	flagEnableColor       = "log.enable-color"
+	flagEnableCaller      = "log.enable-caller"
+	flagOutputPaths       = "log.output-paths"
+	flagErrorOutputPaths  = "log.error-output-paths"
+	flagDevelopment       = "log.development"
+	flagName              = "log.name"
+	flagDisableStacktrace = "log.disable-stacktrace"
+	flagMaxSizeInMB       = "log.max-size-mb"
+	flagMaxAgeInDays      = "log.max-age-days"
 
 	consoleFormat = "console"
 	jsonFormat    = "json"
@@ -41,15 +46,20 @@ const (
 
 // Options contains configuration items related to log.
 type Options struct {
-	Level            string   `json:"level" mapstructure:"level"`
-	Format           string   `json:"format" mapstructure:"format"`
-	EnableColor      bool     `json:"enable-color" mapstructure:"enable-color"`
-	EnableCaller     bool     `json:"enable-caller" mapstructure:"enable-caller"`
-	OutputPaths      []string `json:"output-paths" mapstructure:"output-paths"`
-	ErrorOutputPaths []string `json:"error-output-paths" mapstructure:"error-output-paths"`
+	Level             string   `json:"level"              mapstructure:"level"`
+	Format            string   `json:"format"             mapstructure:"format"`
+	EnableColor       bool     `json:"enable-color"       mapstructure:"enable-color"`
+	EnableCaller      bool     `json:"enable-caller"      mapstructure:"enable-caller"`
+	OutputPaths       []string `json:"output-paths"       mapstructure:"output-paths"`
+	ErrorOutputPaths  []string `json:"error-output-paths" mapstructure:"error-output-paths"`
+	DisableStacktrace bool     `json:"disable-stacktrace" mapstructure:"disable-stacktrace"`
+	Development       bool     `json:"development"        mapstructure:"development"`
+	Name              string   `json:"name"               mapstructure:"name"`
+	MaxSizeInMB       int      `json:"max-size-in-mb"     mapstructure:"max-size-in-mb"`
+	MaxAgeInDays      int      `json:"max-age-in-days"    mapstructure:"max-age-in-days"`
 }
 
-// NewOptions creates a Options object with default parameters.
+// NewOptions creates Options object with default parameters.
 func NewOptions() *Options {
 	return &Options{
 		Level:            zapcore.InfoLevel.String(),
@@ -86,9 +96,22 @@ func (o *Options) AddFlags(fs *pflag.FlagSet) {
 	fs.BoolVar(&o.EnableCaller, flagEnableCaller, o.EnableCaller, "Enable output of caller information in the log.")
 	fs.StringSliceVar(&o.OutputPaths, flagOutputPaths, o.OutputPaths, "Output paths of log.")
 	fs.StringSliceVar(&o.ErrorOutputPaths, flagErrorOutputPaths, o.ErrorOutputPaths, "Error output paths of log.")
+	fs.BoolVar(
+		&o.Development,
+		flagDevelopment,
+		o.Development,
+		"Development puts the logger in development mode, which changes "+
+			"the behavior of DPanicLevel and takes stacktraces more liberally.",
+	)
+	fs.StringVar(&o.Name, flagName, o.Name, "The name of the logger.")
+	fs.BoolVar(&o.DisableStacktrace, flagDisableStacktrace,
+		o.DisableStacktrace, "Disable the log to record a stack trace for all messages at or above panic level.")
+	fs.IntVar(&o.MaxSizeInMB, flagMaxSizeInMB, o.MaxSizeInMB, "The max size in MB.")
+	fs.IntVar(&o.MaxAgeInDays, flagMaxAgeInDays, o.MaxAgeInDays, "The max age in Days.")
 }
 
 func (o *Options) String() string {
-	data, _ := json.Marshal(o)
+	data, _ := json.Marshal(o) //nolint: errchkjson
+
 	return string(data)
 }
