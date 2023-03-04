@@ -20,7 +20,6 @@
 package log
 
 import (
-	"context"
 	"log"
 	"sync"
 
@@ -80,15 +79,15 @@ type Logger interface {
 	// See Info for documentation on how key/value pairs work.
 	WithValues(keysAndValues ...interface{}) Logger
 
+	// WithFields adds some fields to logger.
+	WithFields(fields ...Field) Logger
+
 	// WithName adds a new element to the logger's name.
 	// Successive calls with WithName continue to append
 	// suffixes to the logger's name.  It's strongly recommended
 	// that name segments contain only letters, digits, and hyphens
 	// (see the package documentation for more information).
 	WithName(name string) Logger
-
-	// WithContext returns a copy of context in which the log value is set.
-	WithContext(ctx context.Context) context.Context
 
 	// Flush calls the underlying Core's Sync method, flushing any buffered
 	// log entries. Applications should take care to call Sync before exiting.
@@ -132,7 +131,7 @@ type teeOption struct {
 	enabler zapcore.LevelEnabler
 }
 
-// nolint: gochecknoinits // need to init a default logger
+//nolint: gochecknoinits // need to init a default logger
 func init() {
 	Init(NewOptions())
 }
@@ -201,6 +200,9 @@ func WithValues(keysAndValues ...interface{}) Logger { return _logger.WithValues
 // WithName adds a new path segment to the logger's name. Segments are joined by
 // periods. By default, Loggers are unnamed.
 func WithName(s string) Logger { return _logger.WithName(s) }
+
+// WithFields adds multiple fields to default logger.
+func WithFields(fields ...Field) Logger { return _logger.WithFields(fields...) }
 
 // Flush calls the underlying Core's Sync method, flushing any buffered
 // log entries. Applications should take care to call Sync before exiting.

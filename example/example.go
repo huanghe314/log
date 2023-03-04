@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"flag"
 
 	"github.com/huanghe314/log"
@@ -52,4 +53,8 @@ func main() {
 	log.Info("This is a info message", log.Int32("key2", 10))
 	log.Warn("This is a warn message", log.Bool("key3", false))
 	log.Error("This is a error message", log.Any("key4", "any"))
+
+	ctx := context.Background()
+	ctx = log.NewContext(ctx, log.String("x-request-id", "1234"), log.Int("key2", 1234))
+	log.Ctx(ctx).Info("log after fields added", log.Int("key3", 456))
 }

@@ -28,19 +28,17 @@ const (
 	logContextKey key = iota
 )
 
-// WithContext returns a copy of context in which the log value is set.
-func (l *logger) WithContext(ctx context.Context) context.Context {
-	return context.WithValue(ctx, logContextKey, l)
-}
-
-// FromContext returns the value of the log key on the ctx.
-func FromContext(ctx context.Context) Logger {
-	if ctx != nil {
-		logger := ctx.Value(logContextKey)
-		if logger != nil {
-			return logger.(Logger)
-		}
+func Ctx(ctx context.Context) Logger {
+	if ctx == nil {
+		return _logger
+	}
+	if ctxLogger, ok := ctx.Value(logContextKey).(Logger); ok {
+		return ctxLogger
 	}
 
-	return WithName("Unknown-Context")
+	return _logger
+}
+
+func NewContext(ctx context.Context, fields ...Field) context.Context {
+	return context.WithValue(ctx, logContextKey, Ctx(ctx).WithFields(fields...))
 }

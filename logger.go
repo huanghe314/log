@@ -156,6 +156,12 @@ func (l *logger) Fatalw(msg string, keysAndValues ...interface{}) {
 	l.zapLogger.Sugar().Fatalw(msg, keysAndValues...)
 }
 
+func (l *logger) WithFields(fields ...Field) Logger {
+	newLogger := l.zapLogger.With(fields...)
+
+	return NewLogger(newLogger)
+}
+
 // handleFields converts a bunch of arbitrary key-value pairs into Zap fields.  It takes
 // additional pre-converted Zap fields, for use with automatically attached fields, like
 // `error`.
